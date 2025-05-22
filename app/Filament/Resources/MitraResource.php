@@ -2,16 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MitraResource\Pages;
-use App\Filament\Resources\MitraResource\RelationManagers;
-use App\Models\Mitra;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Mitra;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\DeleteAction;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\Modal\Actions\Action;
+use App\Filament\Resources\MitraResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\MitraResource\RelationManagers;
 
 class MitraResource extends Resource
 {
@@ -57,45 +61,38 @@ class MitraResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nik')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('nama_mitra')
-                    ->searchable(),
+                    ->label('Nama Mitra')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('posisi')
+                    ->label('Posisi')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('alamat')
-                    ->searchable(),
+                    ->label('Alamat')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tanggal_lahir')
+                    ->label('Tanggal Lahir')
                     ->date()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('npwp')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('jenis_kelamin')
-                    ->searchable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('pekerjaan')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
+                    ->label('Pekerjaan')
+                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-   Tables\Actions\DeleteAction::make(),
-
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

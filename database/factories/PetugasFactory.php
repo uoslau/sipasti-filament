@@ -21,7 +21,7 @@ class PetugasFactory extends Factory
             'mitra_id' => $this->faker->numberBetween(1, 100),
             'kegiatan_id' => $this->faker->numberBetween(1, 5),
             'bertugas_sebagai' => $this->faker->randomElement(['PCL', 'PML']),
-            'wilayah_tugas' => $this->faker->randomElement(['Nias', 'Nias Barat']),
+            'wilayah_tugas' => $this->faker->randomElement(['1201', '1225']),
             'beban' => $this->faker->numberBetween(1, 15),
             'satuan' => $this->faker->randomElement(['Dokumen', 'BS', 'Rumah Tangga']),
             'honor' => 0,

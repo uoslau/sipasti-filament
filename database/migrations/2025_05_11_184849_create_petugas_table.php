@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('no_bast')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['kegiatan_id', 'mitra_id']);
         });
     }
 

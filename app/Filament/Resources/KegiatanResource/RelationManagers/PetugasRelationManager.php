@@ -3,13 +3,20 @@
 namespace App\Filament\Resources\KegiatanResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Form;
-use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Illuminate\Validation\Rule;
+use Filament\Forms\Components\Grid;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ActionGroup;
+use App\Filament\Imports\PetugasImporter;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\ImportAction;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Actions\Modal\Actions\Action;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\RelationManagers\RelationManager;
 
 class PetugasRelationManager extends RelationManager
 {
@@ -34,6 +41,11 @@ class PetugasRelationManager extends RelationManager
                             ->searchable()
                             ->preload()
                             ->disabled(fn(string $context) => $context === 'edit')
+                            ->unique(
+                                table: 'petugas',
+                                column: 'mitra_id',
+                                modifyRuleUsing: fn(Rule $rule) => $rule->where('kegiatan_id', $this->ownerRecord->id)
+                            )
                     ]),
                 Forms\Components\TextInput::make('bertugas_sebagai')
                     ->required()
@@ -57,8 +69,14 @@ class PetugasRelationManager extends RelationManager
                     ->hidden()
                     ->dehydrated(true)
                     ->numeric(),
-
             ]);
+    }
+
+    protected function getValidationMessages(): array
+    {
+        return [
+            'mitra_id.unique' => 'Petugas ini sudah terdaftar dalam kegiatan ini.',
+        ];
     }
 
     protected function mutateFormDataBeforeCreate(array $data): array
@@ -132,6 +150,7 @@ class PetugasRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+                ImportAction::make()->importer(PetugasImporter::class),
                 Tables\Actions\CreateAction::make()
                     ->using(function (array $data) {
                         $data = $this->mutateFormDataBeforeCreate($data);
@@ -139,13 +158,15 @@ class PetugasRelationManager extends RelationManager
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->using(function ($record, array $data) {
-                        $data = $this->mutateFormDataBeforeSave($data);
-                        $record->update($data);
-                        return $record;
-                    }),
-                Tables\Actions\DeleteAction::make(),
+                ActionGroup::make([
+                    EditAction::make()
+                        ->using(function ($record, array $data) {
+                            $data = $this->mutateFormDataBeforeSave($data);
+                            $record->update($data);
+                            return $record;
+                        }),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

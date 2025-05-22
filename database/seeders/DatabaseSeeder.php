@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
                 MitraSeeder::class,
                 TimKerjaSeeder::class,
                 KegiatanSeeder::class,
-                PetugasSeeder::class,
+                // PetugasSeeder::class,
             ]
         );
     }
